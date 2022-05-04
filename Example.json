@@ -1,0 +1,5 @@
+{
+  "MailTo": ["bob@contoso.com"],
+  "DebtorFile": "c:\\debtors.txt",
+  "InvoiceFile": "c:\\invoices.txt"
+}
