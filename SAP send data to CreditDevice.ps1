@@ -255,7 +255,8 @@ Process {
                 BusinessLine      = $line.SubString(186, 3).Trim()
                 Reference         = if ($line.length -gt 189) { 
                     $line.SubString(189, $line.length - 189).Trim()
-                } else {''}
+                }
+                else { '' }
             }
         }
         #endregion
@@ -275,7 +276,9 @@ Process {
 
         #region Send mail to end user
         $mailParams += @{
-            Subject = 'Upload'
+            Subject = '{0} invoices, {1} debtors' -f 
+            ($fileContent.invoice.converted | Measure-Object).Count,
+            ($fileContent.debtor.converted | Measure-Object).Count
             Message =
             "<p>Folder <a href=""$($InvoicesFolderItem.FullName)"">$($InvoicesFolderItem.Name)</a>:</p>
                 $table

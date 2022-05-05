@@ -405,9 +405,6 @@ Describe 'when all tests pass' {
             }
         }
     }
-    It 'create a sent items folder in the mailbox' {
-        Should -Invoke New-MailboxFolderHC -Exactly 1 -Scope Describe 
-    }
     It 'send a summary mail to the user' {
         Should -Invoke Send-MailAuthenticatedHC -Exactly 1 -Scope Describe -ParameterFilter {
             ($From -eq $testMail.From) -and
