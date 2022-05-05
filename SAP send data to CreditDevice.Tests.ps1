@@ -404,7 +404,7 @@ Describe 'when all tests pass' {
                 }
             }
         }
-    } -Tag test   
+    }
     It 'create a sent items folder in the mailbox' {
         Should -Invoke New-MailboxFolderHC -Exactly 1 -Scope Describe 
     }
