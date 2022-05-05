@@ -143,12 +143,12 @@ Describe 'when all tests pass' {
     BeforeAll {
         $testDate = @{
             Debtor  = @"
-        0021999981BE99THE FEDERATION                     STAR FLEET STREET 9                1234      GALAXY                             JEAN-LUC PICARD                                                                                   01 GA 0345 12 12 12                   piacard@starfleet.com                                                            PICARDJL                   2EURBE0xxxx4x688                                           0021920781SF01F EURZBAR                                                                     BE14     EI                                       WORLD                                                          0,0020210101             3186.31C011111111181
-        0029843423    CONTOSO                            STREET IN REDMOND 1                9999      REDMOND                                                                                                                              02 US 555 43 33 68    0477 11 11 11   info@contoso.com                                                                 CNORRIS                14000   GB5555554536                                           0021920823US01N USD                                                                         BE98        EI /also customer 21111114       M    US                    37-003-0021                           4250,0020210101             7306.50US99999999993F2
+0021999981BE99THE FEDERATION                     STAR FLEET STREET 9                1234      GALAXY                             JEAN-LUC PICARD                                                                                   01 GA 0345 12 12 12                   piacard@starfleet.com                                                            PICARDJL                   2EURBE0xxxx4x688                                           0021920781SF01F EURZBAR                                                                     BE14     EI                                       WORLD                                                          0,0020210101             3186.31C011111111181
+0029843423    CONTOSO                            STREET IN REDMOND 1                9999      REDMOND                                                                                                                              02 US 555 43 33 68    0477 11 11 11   info@contoso.com                                                                 CNORRIS                14000   GB5555554536                                           0021920823US01N USD                                                                         BE98        EI /also customer 21111114       M    US                    37-003-0021                           4250,0020210101             7306.50US99999999993F2
 "@
             Invoice = @"
-            0021111417US106001076236US10999999999999928          752,14          752,142175116578                                        20220430EURUS6YBE10RV2175116578       000000000  6001076236     2175116578
-            0021439990GB104900050714GB10246546546610726        -1165,00        -1165,00DP2165769534  15/05/2021  (23/07/2021)            20210726EURGBE6BE10DZ                 000000000  4900050714  RMC
+0021673055BE123400012346BE10202200220220411        -2366,00        -2366,00KLANT 98598675 / BESTELLING 2121628403 VAN DEN D  20220411EURBES4BE10DZ                 000000000  4900022656  RMC
+0021002568BE321500063216BE10202100120210713       124005,86       124005,867100000376 Recharge HTC AEM Q2-2021               20210728EURBE15BE10DM                 000000000  5100000376  CEM2165877817
 "@
         }
         $testExportedExcelRows = @{
@@ -160,67 +160,138 @@ Describe 'when all tests pass' {
                     StreetAddress1     = 'STAR FLEET STREET 9'
                     PostalCode         = '1234'
                     City               = 'GALAXY'
-                    StreetAddress2     = $null
-                    StreetAddress3     = $null
-                    StreetAddress4     = $null
-                    StreetAddress5     = $null
+                    StreetAddress2     = 'JEAN-LUC PICARD'
+                    StreetAddress3     = ''
+                    StreetAddress4     = ''
+                    StreetAddress5     = ''
                     StreetAddress6     = '01'
                     CountryCode        = 'GA'             
                     PhoneNumber1       = '0345 12 12 12'
-                    PhoneNumber2       = $null
+                    PhoneNumber2       = ''
                     EmailAddress       = 'piacard@starfleet.com'
-                    FaxNumber          = $null
+                    FaxNumber          = ''
                     SearchCode         = 'PICARDJL'
-                    URL                = $null
                     CreditLimit        = '2'
                     Currency           = 'EUR'
                     RegistrationNumber = 'BE0xxxx4x688'
+                    URL                = ''
                     OriginalCustomer   = '0021920781'
-                    AccountGroup       = '0021920781'
-                    DeletionFlag       = 'Test1'
-                    CustomerLanguage   = 'Test1'
-                    CustomerCurrency   = 'Test1'
-                    PaymentTerms       = 'Test1'
-                    AccountPosition    = 'Test1'
-                    Collection         = 'Test1'
-                    AccountNumber      = 'Test1'
-                    IBAN               = 'Test1'
-                    BIC                = 'Test1'
-                    LegalEntity        = 'Test1'
-                    BkGk               = 'Test1'
-                    Comment1           = 'Test1'
-                    Comment2           = 'Test1'
-                    Comment3           = 'Test1'
-                    Comment4           = 'Test1'
-                    ParentCompany      = 'Test1'
-                    DunningClerk       = 'Test1'
-                    AccountClerk       = 'Test1'
-                    CountryName        = 'Test1'
-                    DunningNumber      = 'Test1'
-                    DbCreditLimit      = 'Test1'
-                    NextInReview       = 'Test1'
-                    CreditExposure     = 'Test1'
-                    RiskCategory       = 'Test1'
-                    CreditAccount      = 'Test1'
-                    Rating             = 'Test1'
+                    AccountGroup       = 'SF01'
+                    CustomerLanguage   = 'F'
+                    DeletionFlag       = ''
+                    CustomerCurrency   = 'EUR'
+                    PaymentTerms       = 'ZBAR'
+                    AccountPosition    = ''
+                    Collection         = ''
+                    AccountNumber      = ''
+                    IBAN               = ''
+                    BIC                = ''
+                    LegalEntity        = 'BE14'
+                    BkGk               = ''
+                    Comment1           = ''
+                    Comment2           = 'EI'
+                    Comment3           = ''
+                    Comment4           = ''
+                    ParentCompany      = ''
+                    DunningClerk       = ''
+                    AccountClerk       = ''
+                    CountryName        = 'WORLD'
+                    DunningNumber      = ''
+                    DbCreditLimit      = '0,00'
+                    NextInReview       = '20210101'
+                    CreditExposure     = '3186.3'
+                    RiskCategory       = '1C0'
+                    CreditAccount      = '11111111'
+                    Rating             = '18'
+                }
+                @{
+                    DebtorNumber       = '0029843423'
+                    PlantNumber        = ''
+                    CompanyName        = 'CONTOSO'
+                    StreetAddress1     = 'STREET IN REDMOND 1'
+                    PostalCode         = '9999'
+                    City               = 'REDMOND'
+                    StreetAddress2     = ''
+                    StreetAddress3     = ''
+                    StreetAddress4     = ''
+                    StreetAddress5     = ''
+                    StreetAddress6     = '02'
+                    CountryCode        = 'US'             
+                    PhoneNumber1       = '555 43 33 68'
+                    PhoneNumber2       = '0477 11 11 11'
+                    EmailAddress       = 'info@contoso.com'
+                    FaxNumber          = ''
+                    SearchCode         = 'CNORRIS'
+                    URL                = ''
+                    CreditLimit        = '14000'
+                    Currency           = ''
+                    RegistrationNumber = 'GB5555554536'
+                    OriginalCustomer   = '0021920823'
+                    AccountGroup       = 'US01'
+                    DeletionFlag       = ''
+                    CustomerLanguage   = 'N'
+                    CustomerCurrency   = 'USD'
+                    PaymentTerms       = ''
+                    AccountPosition    = ''
+                    Collection         = ''
+                    AccountNumber      = ''
+                    IBAN               = ''
+                    BIC                = ''
+                    LegalEntity        = 'BE98'
+                    BkGk               = ''
+                    Comment1           = ''
+                    Comment2           = ''
+                    Comment3           = 'EI'
+                    Comment4           = '/also customer 21111114'
+                    ParentCompany      = 'M'
+                    DunningClerk       = ''
+                    AccountClerk       = ''
+                    CountryName        = 'US'
+                    DunningNumber      = '37-003-0021'
+                    DbCreditLimit      = '4250,00'
+                    NextInReview       = '20210101'
+                    CreditExposure     = '7306.5'
+                    RiskCategory       = '0US'
+                    CreditAccount      = '99999999'
+                    Rating             = '99'
                 }
             )
             Invoice = @(
                 @{
-                    DebtorNumber      = '0021999981BE99'
-                    InvoiceNumber     = 'KROMMENI'
-                    InvoiceDate       = 2105880255
-                    InvoiceDueDate    = 'Rosariumlaan 47'
-                    InvoiceAmount     = 2104737363
-                    OutstandingAmount = 22016630
-                    Description       = 'Faber W Krommenie'
-                    Currency          = 'Rosariumlaan 47'
-                    BusinessArea      = 'Rosariumlaan 47'
-                    CompanyCode       = 'Rosariumlaan 47'
-                    DocumentType      = 'Rosariumlaan 47'
-                    DunningBlock      = 103464
-                    BusinessLine      = 'CEM I 42,5 N BULK'
-                    Reference         = 29.700
+                    DebtorNumber      = '0021673055'
+                    PlantNumber       = 'BE12'
+                    InvoiceNumber     = '3400012346'
+                    InvoiceDate       = '20220411'
+                    InvoiceDueDate    = '20220411'
+                    InvoiceAmount     = '-2366,00'
+                    OutstandingAmount = '-2366,00'
+                    Description       = 'KLANT 98598675 / BESTELLING 2121628403 VAN DEN D'
+                    Currency          = 'EUR'
+                    BusinessArea      = 'BES4'
+                    CompanyCode       = 'BE10'
+                    DunningLevel      = 'D'
+                    DocumentType      = ''
+                    DunningBlock      = '0'
+                    BusinessLine      = 'RMC'
+                    Reference         = ''
+                }
+                @{
+                    DebtorNumber      = '0021002568'
+                    PlantNumber       = 'BE32'
+                    InvoiceNumber     = '1500063216'
+                    InvoiceDate       = '20210713'
+                    InvoiceDueDate    = '20210728'
+                    InvoiceAmount     = '124005,86'
+                    OutstandingAmount = '124005,86'
+                    Description       = '7100000376 Recharge HTC AEM Q2-2021'
+                    Currency          = 'EUR'
+                    BusinessArea      = 'BE15'
+                    CompanyCode       = 'BE10'
+                    DunningLevel      = 'D'
+                    DocumentType      = ''
+                    DunningBlock      = '0'
+                    BusinessLine      = 'CEM'
+                    Reference         = '2165877817'
                 }
             )
         }
@@ -240,42 +311,100 @@ Describe 'when all tests pass' {
         
         .$testScript @testParams
     }
-    Context 'copy source data to log folder' {
+    Context 'copy source files to log folder' {
         It 'Debtor.txt' {
             Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Debtor.txt' | Should -Not -BeNullOrEmpty
         }
         It 'Invoice.txt' {
             Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Invoice.txt' | Should -Not -BeNullOrEmpty
         }
-    } -Tag test
+    }
     Context 'export an Excel file' {
         BeforeAll {
-            $testExcelLogFile = Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Picard - Summary.xlsx'
-
-            $actual = Import-Excel -Path $testExcelLogFile.FullName -WorksheetName 'Data'
+            $testExcelLogFile = Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Converted data.xlsx'
         }
         It 'to the log folder' {
             $testExcelLogFile | Should -Not -BeNullOrEmpty
         }
-        It 'with the correct total rows' {
-            $actual | Should -HaveCount $testExportedExcelRows.Count
-        }
-        It 'with the correct data in the rows' {
-            foreach ($testRow in $testExportedExcelRows) {
-                $actualRow = $actual | Where-Object {
-                    $_.ShipmentNumber -eq $testRow.ShipmentNumber
-                }
-                @(
-                    'Plant', 'DeliveryNumber', 'ShipToNumber', 'ShipToName',
-                    'Address', 'City', 'MaterialNumber', 'MaterialDescription',
-                    'Tonnage', 'LoadingDate', 'TruckID', 'PickingStatus', 
-                    'SiloBulkID', 'File'
-                ) | ForEach-Object {
-                    $actualRow.$_ | Should -Be $testRow.$_
+        Context "with worksheet 'Debtor'" {
+            BeforeAll {
+                $actual = Import-Excel -Path $testExcelLogFile.FullName -WorksheetName 'Debtor'
+            }
+            It 'with the correct total rows' {
+                $actual | Should -HaveCount $testExportedExcelRows.Debtor.Count
+            }
+            It 'with the correct data in the rows' {
+                foreach ($testRow in $testExportedExcelRows.Debtor) {
+                    $actualRow = $actual | Where-Object {
+                        $_.DebtorNumber -eq $testRow.DebtorNumber
+                    }
+                    @(
+                        'DebtorNumber', 'PlantNumber', 'CompanyName', 
+                        'StreetAddress1', 'PostalCode', 'City', 
+                        'StreetAddress2', 'StreetAddress3',
+                        'StreetAddress4', 'StreetAddress5',
+                        'StreetAddress6', 'CountryCode',
+                        'PhoneNumber1', 'PhoneNumber2',
+                        'EmailAddress', 'FaxNumber',
+                        'SearchCode', 'CreditLimit',
+                        'Currency', 'RegistrationNumber',
+                        'URL', 'OriginalCustomer',
+                        'AccountGroup', 'CustomerLanguage',
+                        'DeletionFlag', 'CustomerCurrency',
+                        'PaymentTerms', 'AccountPosition',
+                        'Collection', 'AccountNumber',
+                        'IBAN', 'BIC',
+                        'LegalEntity', 'BkGk',
+                        'Comment1', 'Comment2',
+                        'Comment3', 'Comment4',
+                        'ParentCompany', 'DunningClerk',
+                        'AccountClerk', 'CountryName',
+                        'DunningNumber', 'DbCreditLimit',
+                        'NextInReview', 'CreditExposure',
+                        'RiskCategory', 'CreditAccount',
+                        'Rating'
+                    ) | ForEach-Object {
+                        $actualRow.$_ | Should -Be $testRow.$_
+                    }
                 }
             }
         }
-    }
+        Context "with worksheet 'Invoice'" {
+            BeforeAll {
+                $actual = Import-Excel -Path $testExcelLogFile.FullName -WorksheetName 'Invoice'
+            }
+            It 'with the correct total rows' {
+                $actual | Should -HaveCount $testExportedExcelRows.Invoice.Count
+            }
+            It 'with the correct data in the rows' {
+                foreach ($testRow in $testExportedExcelRows.Invoice) {
+                    $actualRow = $actual | Where-Object {
+                        $_.DebtorNumber -eq $testRow.DebtorNumber
+                    }
+                    @(
+                        'DebtorNumber',     
+                        'PlantNumber',     
+                        'InvoiceNumber',    
+                        'InvoiceDate',     
+                        'InvoiceDueDate   ',
+                        'InvoiceAmount', 
+                        'OutstandingAmount',
+                        'Description',     
+                        'Currency',     
+                        'BusinessArea',     
+                        'CompanyCode',     
+                        'DunningLevel',     
+                        'DocumentType',     
+                        'DunningBlock',     
+                        'BusinessLine',     
+                        'Reference'
+                    ) | ForEach-Object {
+                        $actualRow.$_ | Should -Be $testRow.$_
+                    }
+                }
+            }
+        }
+    } -Tag test   
     It 'create a sent items folder in the mailbox' {
         Should -Invoke New-MailboxFolderHC -Exactly 1 -Scope Describe 
     }
