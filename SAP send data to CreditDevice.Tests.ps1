@@ -147,8 +147,12 @@ Describe 'when all tests pass' {
 0029843423    CONTOSO                            STREET IN REDMOND 1                9999      REDMOND                                                                                                                              02 US 555 43 33 68    0477 11 11 11   info@contoso.com                                                                 CNORRIS                14000   GB5555554536                                           0021920823US01N USD                                                                         BE98        EI /also customer 21111114       M    US                    37-003-0021                           4250,0020210101             7306.50US99999999993F2
 "@
             Invoice = @"
-0021673055BE123400012346BE10202200220220411        -2366,00        -2366,00KLANT 98598675 / BESTELLING 2121628403 VAN DEN D  20220411EURBES4BE10DZ                 000000000  4900022656  RMC
-0021002568BE321500063216BE10202100120210713       124005,86       124005,867100000376 Recharge HTC AEM Q2-2021               20210728EURBE15BE10DM                 000000000  5100000376  CEM2165877817
+0021419307BE106001077828BE10202200120220228          141,57          141,572165881081                                        20220429EURBEN3BE10RV2165881081       000000000  6001077828  RMC2165881081
+0021402383BE106001081024BE10202200120220314        18783,42        18783,422190485876                                        20220430EURBE2DBE10RV2190485876       000000000  6001081024  CEM2190485876
+0021657240BE105100000446BE10202100120210831          370,20          370,205100000446                                        20211031EURBE10BE10DMDM-202108-0004   000000000  5100000446  CEM
+0021002568BE101100000058BE10202100120211115        -6795,00        -6795,00                                                  20211115EURBE16BE10DC                 000000000  1100000058  CEM
+0021614403BE104900006280BE10202100220210129          -84,10          -84,10DB2165721342  31/12/2020  (17/01/2021)            20210129EURBEN4BE10DZ                 000000000  4900006280  RMC
+0021626016BE105100000161BE10202200120220331        14508,49        14508,495100000161                                        20220430EURBE6YBE10DM                 000000000  5100000161
 "@
         }
         $testExportedExcelRows = @{
@@ -258,56 +262,103 @@ Describe 'when all tests pass' {
             )
             Invoice = @(
                 @{
-                    DebtorNumber      = '0021673055'
-                    PlantNumber       = 'BE12'
-                    InvoiceNumber     = '3400012346'
-                    InvoiceDate       = '20220411'
-                    InvoiceDueDate    = '20220411'
-                    InvoiceAmount     = '-2366,00'
-                    OutstandingAmount = '-2366,00'
-                    Description       = 'KLANT 98598675 / BESTELLING 2121628403 VAN DEN D'
-                    Currency          = 'EUR'
-                    BusinessArea      = 'BES4'
+                    # documentType RV | DB, InvoiceNumber = Reference
+                    # documentType DM | DC, InvoiceNumber = SapDocumentNumber
+                    
+                    # documentType RV
+                    SapDocumentNumber = '6001077828'
+                    DebtorNumber      = '0021419307'
                     CompanyCode       = 'BE10'
-                    DunningLevel      = 'D'
-                    DocumentType      = ''
-                    DunningBlock      = '0'
-                    BusinessLine      = 'RMC'
-                    Reference         = ''
+                    BusinessArea      = 'BEN3'
+                    DocumentType      = 'RV'
+                    Reference         = '2165881081'
+                    InvoiceNumber     = '2165881081'
+                    Description       = ''
+                    DocumentDate      = '20220228'
+                    NetDueDate        = '20220429'
+                    Amount            = '141,57'
+                    Currency          = 'EUR'
                 }
                 @{
-                    DebtorNumber      = '0021002568'
-                    PlantNumber       = 'BE32'
-                    InvoiceNumber     = '1500063216'
-                    InvoiceDate       = '20210713'
-                    InvoiceDueDate    = '20210728'
-                    InvoiceAmount     = '124005,86'
-                    OutstandingAmount = '124005,86'
-                    Description       = '7100000376 Recharge HTC AEM Q2-2021'
-                    Currency          = 'EUR'
-                    BusinessArea      = 'BE15'
+                    # documentType DB
+                    SapDocumentNumber = '6001081024'
+                    DebtorNumber      = '0021402383'
                     CompanyCode       = 'BE10'
-                    DunningLevel      = 'D'
-                    DocumentType      = ''
-                    DunningBlock      = '0'
-                    BusinessLine      = 'CEM'
-                    Reference         = '2165877817'
+                    BusinessArea      = 'BE2D'
+                    DocumentType      = 'RV'
+                    Reference         = '2190485876'
+                    InvoiceNumber     = '2190485876'
+                    Description       = ''
+                    DocumentDate      = '20220314'
+                    NetDueDate        = '20220430'
+                    Amount            = '18783,42'
+                    Currency          = 'EUR'
+                }
+                @{
+                    # documentType DM
+                    SapDocumentNumber = '5100000446'
+                    DebtorNumber      = '0021657240'
+                    CompanyCode       = 'BE10'
+                    BusinessArea      = 'BE10'
+                    DocumentType      = 'DM'
+                    Reference         = ''
+                    InvoiceNumber     = '5100000446'
+                    Description       = ''
+                    DocumentDate      = '20210831'
+                    NetDueDate        = '20211031'
+                    Amount            = '370,20'
+                    Currency          = 'EUR'
+                }
+                @{
+                    # documentType DC
+                    SapDocumentNumber = '1100000058'
+                    DebtorNumber      = '0021002568'
+                    CompanyCode       = 'BE10'
+                    BusinessArea      = 'BE16'
+                    DocumentType      = 'DC'
+                    Reference         = ''
+                    InvoiceNumber     = '1100000058'
+                    Description       = ''
+                    DocumentDate      = '20211115'
+                    NetDueDate        = '20211115'
+                    Amount            = '-6795,00'
+                    Currency          = 'EUR'
+                }
+                @{
+                    # documentType DZ
+                    SapDocumentNumber = '4900006280'
+                    DebtorNumber      = '0021614403'
+                    CompanyCode       = 'BE10'
+                    BusinessArea      = 'BEN4'
+                    DocumentType      = 'DZ'
+                    Reference         = ''
+                    InvoiceNumber     = ''
+                    Description       = 'DB2165721342  31/12/2020  (17/01/2021}'
+                    DocumentDate      = '20210129'
+                    NetDueDate        = '20210129'
+                    Amount            = '-84,10'
+                    Currency          = 'EUR'
+                }
+                @{
+                    # no business line
+                    SapDocumentNumber = '5100000161' 
+                    DebtorNumber      = '0021626016'
+                    CompanyCode       = 'BE10'
+                    BusinessArea      = 'BE6Y'
+                    DocumentType      = 'DM'
+                    Reference         = ''
+                    InvoiceNumber     = '4900006280'
+                    Description       = '5100000161'
+                    DocumentDate      = '20220331'
+                    NetDueDate        = '20220430'
+                    Amount            = '14508,49'
+                    Currency          = 'EUR'
                 }
             )
         }
 
         $testDate.Debtor | Out-File -FilePath $testImportFile.DebtorFile
         $testDate.Invoice | Out-File -FilePath $testImportFile.InvoiceFile
-
-        $testMail = @{
-            From           = 'boss@contoso.com'
-            To             = 'bob@contoso.com'
-            Bcc            = @('jack@contoso.com', 'mike@contoso.com')
-            SentItemsPath  = '\PowerShell\{0} SENT' -f $testParams.ScriptName
-            EventLogSource = $testParams.ScriptName
-            Subject        = 'Picard, 2 deliveries'
-            Body           = "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*"
-        }
         
         .$testScript @testParams
     }
@@ -336,7 +387,7 @@ Describe 'when all tests pass' {
             It 'with the correct data in the rows' {
                 foreach ($testRow in $testExportedExcelRows.Debtor) {
                     $actualRow = $actual | Where-Object {
-                        $_.DebtorNumber -eq $testRow.DebtorNumber
+                        $_.SapDocumentNumber -eq $testRow.SapDocumentNumber
                     }
                     @(
                         'DebtorNumber', 'PlantNumber', 'CompanyName', 
@@ -379,24 +430,19 @@ Describe 'when all tests pass' {
             It 'with the correct data in the rows' {
                 foreach ($testRow in $testExportedExcelRows.Invoice) {
                     $actualRow = $actual | Where-Object {
-                        $_.DebtorNumber -eq $testRow.DebtorNumber
+                        $_.SapDocumentNumber -eq $testRow.SapDocumentNumber
                     }
                     @(
                         'DebtorNumber',     
-                        'PlantNumber',     
+                        'CompanyCode',     
                         'InvoiceNumber',    
-                        'InvoiceDate',     
-                        'InvoiceDueDate   ',
-                        'InvoiceAmount', 
-                        'OutstandingAmount',
+                        'DocumentDate',     
+                        'NetDueDate',
+                        'Amount', 
                         'Description',     
                         'Currency',     
                         'BusinessArea',     
-                        'CompanyCode',     
-                        'DunningLevel',     
                         'DocumentType',     
-                        'DunningBlock',     
-                        'BusinessLine',     
                         'Reference'
                     ) | ForEach-Object {
                         $actualRow.$_ | Should -Be $testRow.$_
@@ -406,19 +452,16 @@ Describe 'when all tests pass' {
         }
     }
     It 'send a summary mail to the user' {
-        Should -Invoke Send-MailAuthenticatedHC -Exactly 1 -Scope Describe -ParameterFilter {
-            ($From -eq $testMail.From) -and
-            ($To -eq $testMail.To) -and
-            ($Bcc -contains $ScriptAdmin) -and
-            ($Bcc -contains $testMail.Bcc[0]) -and
-            ($Bcc -contains $testMail.Bcc[1]) -and
-            ($SentItemsPath -eq $testMail.SentItemsPath) -and
-            ($EventLogSource -eq $testMail.EventLogSource) -and
-            ($Subject -eq $testMail.Subject) -and
-            ($Attachments.Count -eq 1) -and
-            ($Attachments[0] -like '* - Picard - Summary.xlsx') -and
-            # ($Attachments[0] -Like '* - Picard - Test1.asc') -and
-            ($Body -like $testMail.Body)
+        Should -Invoke Send-MailHC -Exactly 1 -Scope Describe -ParameterFilter {
+            ($To -eq $testImportFile.MailTo) -and
+            ($Bcc -eq $ScriptAdmin) -and
+            ($Subject -eq '2 invoices, 2 debtors') -and
+            ($Attachments.Count -eq 3) -and
+            ($Attachments[0] -like '* - Converted data.xlsx') -and
+            ($Attachments[1] -like '* - Debtor.txt') -and
+            ($Attachments[2] -like '* - Invoice.txt')
+            #  -and
+            # ($Body -like "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*")
         }
-    }
+    } -Tag test
 }
