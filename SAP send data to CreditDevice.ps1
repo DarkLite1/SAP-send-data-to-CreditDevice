@@ -168,56 +168,56 @@ Process {
             $fileContent.debtor.raw
         ) {
             try {
-                [PSCustomObject]@{
-                    DebtorNumber       = $line.SubString(0, 10).Trim()
-                    PlantNumber        = $line.SubString(10, 4).Trim()
-                    CompanyName        = $line.SubString(14, 35).Trim()
-                    StreetAddress1     = $line.SubString(49, 35).Trim()
-                    PostalCode         = $line.SubString(84, 10).Trim()
-                    City               = $line.SubString(94, 35).Trim()
-                    StreetAddress2     = $line.SubString(129, 35).Trim()
-                    StreetAddress3     = $line.SubString(164, 18).Trim()
-                    StreetAddress4     = $line.SubString(182, 10).Trim()
-                    StreetAddress5     = $line.SubString(192, 35).Trim()
-                    StreetAddress6     = $line.SubString(227, 3).Trim()
-                    CountryCode        = $line.SubString(230, 3).Trim()             
-                    PhoneNumber1       = $line.SubString(233, 16).Trim()
-                    PhoneNumber2       = $line.SubString(249, 16).Trim()
-                    EmailAddress       = $line.SubString(265, 50).Trim()
-                    FaxNumber          = $line.SubString(315, 31).Trim()
-                    SearchCode         = $line.SubString(346, 10).Trim()
-                    CreditLimit        = $line.SubString(356, 18).Trim()
-                    Currency           = $line.SubString(374, 3).Trim()
-                    RegistrationNumber = $line.SubString(377, 20).Trim()
-                    URL                = $line.SubString(397, 35).Trim()
-                    OriginalCustomer   = $line.SubString(432, 10).Trim()
-                    AccountGroup       = $line.SubString(442, 4).Trim()
-                    CustomerLanguage   = $line.SubString(446, 1).Trim()
-                    DeletionFlag       = $line.SubString(447, 1).Trim()
-                    CustomerCurrency   = $line.SubString(448, 3).Trim()
-                    PaymentTerms       = $line.SubString(451, 4).Trim()
-                    AccountPosition    = $line.SubString(455, 2).Trim()
-                    Collection         = $line.SubString(457, 4).Trim()
-                    AccountNumber      = $line.SubString(461, 18).Trim()
-                    IBAN               = $line.SubString(479, 34).Trim()
-                    BIC                = $line.SubString(513, 11).Trim()
-                    LegalEntity        = $line.SubString(524, 4).Trim()
-                    BkGk               = $line.SubString(528, 2).Trim()
-                    Comment1           = $line.SubString(530, 3).Trim()
-                    Comment2           = $line.SubString(533, 3).Trim()
-                    Comment3           = $line.SubString(536, 3).Trim()
-                    Comment4           = $line.SubString(539, 30).Trim()
-                    ParentCompany      = $line.SubString(569, 1).Trim()
-                    DunningClerk       = $line.SubString(570, 2).Trim()
-                    AccountClerk       = $line.SubString(572, 2).Trim()
-                    CountryName        = $line.SubString(574, 22).Trim()
-                    DunningNumber      = $line.SubString(596, 25).Trim()
-                    DbCreditLimit      = $line.SubString(621, 20).Trim()
-                    NextInReview       = $line.SubString(641, 13).Trim()
-                    CreditExposure     = $line.SubString(654, 14).Trim()
-                    RiskCategory       = $line.SubString(668, 3).Trim()
-                    CreditAccount      = $line.SubString(671, 8).Trim()
-                    Rating             = $line.SubString(679, 2).Trim()
+                If ($companyCode = $line.SubString(10, 4).Trim()) {
+                    $creditExposure = if (
+                        $sapCreditExposure = $line.SubString(654, 15).Trim()
+                    ) {
+                        $tmp = $sapCreditExposure.Replace('.', ',')
+                        if ($tmp[-1] -eq '-') {
+                            '-' + $tmp.Substring(0, $tmp.Length - 1)
+                        }
+                        else {
+                            $tmp
+                        }
+                    }
+                    else {
+                        ''
+                    }
+
+
+                    [PSCustomObject]@{
+                        DebtorNumber          = $line.SubString(0, 10).Trim()
+                        CompanyCode           = $companyCode
+                        Name                  = $line.SubString(14, 35).Trim()
+                        NameExtra             = $line.SubString(129, 35).Trim()
+                        Street                = $line.SubString(49, 35).Trim()
+                        PostalCode            = $line.SubString(84, 10).Trim()
+                        City                  = $line.SubString(94, 35).Trim()
+                        CountryCode           = $line.SubString(230, 3).Trim()             
+                        CountryName           = $line.SubString(574, 22).Trim()
+                        PoBox                 = $line.SubString(164, 18).Trim()
+                        PoBoxPostalCode       = $line.SubString(182, 10).Trim()
+                        PoBoxCity             = $line.SubString(192, 35).Trim()
+                        PhoneNumber           = $line.SubString(233, 16).Trim()
+                        MobilePhoneNumber     = $line.SubString(249, 16).Trim()
+                        EmailAddress          = $line.SubString(265, 50).Trim()
+                        Comment               = $line.SubString(533, 36).Trim()
+                        CreditLimit           = $line.SubString(356, 18).Trim()
+                        VatRegistrationNumber = $line.SubString(377, 20).Trim()
+                        AccountGroup          = $line.SubString(442, 4).Trim()
+                        CustomerLanguage      = $line.SubString(446, 1).Trim()
+                        PaymentTerms          = $line.SubString(451, 4).Trim()
+                        DunsNumber            = $line.SubString(596, 11).Trim()
+                        Rating                = if ($line.length -gt 682) {
+                            $line.SubString(682, $line.length - 682).Trim()
+                        }
+                        else { '' }
+                        DbCreditLimit         = $line.SubString(621, 20).Trim()
+                        NextInReview          = $line.SubString(641, 13).Trim()
+                        CreditExposure        = $creditExposure
+                        RiskCategory          = $line.SubString(669, 3).Trim()
+                        CreditAccount         = $line.SubString(674, 8).Trim()
+                    }
                 }
             }    
             catch {

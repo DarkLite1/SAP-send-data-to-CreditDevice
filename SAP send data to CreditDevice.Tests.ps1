@@ -143,8 +143,9 @@ Describe 'when all tests pass' {
     BeforeAll {
         $testDate = @{
             Debtor  = @"
-0021999981BE99THE FEDERATION                     STAR FLEET STREET 9                1234      GALAXY                             JEAN-LUC PICARD                                                                                   01 GA 0345 12 12 12                   piacard@starfleet.com                                                            PICARDJL                   2EURBE0xxxx4x688                                           0021920781SF01F EURZBAR                                                                     BE14     EI                                       WORLD                                                          0,0020210101             3186.31C011111111181
-0029843423    CONTOSO                            STREET IN REDMOND 1                9999      REDMOND                                                                                                                              02 US 555 43 33 68    0477 11 11 11   info@contoso.com                                                                 CNORRIS                14000   GB5555554536                                           0021920823US01N USD                                                                         BE98        EI /also customer 21111114       M    US                    37-003-0021                           4250,0020210101             7306.50US99999999993F2
+0021920631    Switch Poeren Realisatie NW-2 VOF  Westkanaaldijk 2                   3542DA    UTRECHT                            Project 3487 Wintrack              POSTBUS 1025      3600 BA   MAARSSEN                           10 NL 302486911                       crediteuren.scno@strukton.com                                                    SWITCH                     0   NL861210736B01                                         0021920631BE01N EUR                                                                         BE14     EMA    Geen E-invoicing/ KEY        M    NEDERLAND             49-341-0464                           5000,0020221104            43386.04NL10021911144O2
+0021510989NL30Den Ouden Aannemingsbedrijf B.V.   Hermalen 7                         5481 XX   Schijndel                                                             POSTBUS 12        5480 AA                                      07 NL 735431000                       j.bongers@denoudengroep.com                       735498360                      OUDEN                 105875   NL801764063B01                                         0021510989BE01N EURN060  00010653742800        NL20INGB0653742800                INGBNL2A   BE01  KEY23.RH                                6969NEDERLAND             41-589-4518    510989               200000,0020221104           385574.20NL100215109892A2
+0021403350BE10DE BOEVER PETER BVBA               RIJKSWEG 66  A                     9870      MACHELEN - ZULTE                                                                                                                     08 BE 09/3801923      0475/648839     info@deboeverbvba.be                              09/3801923                     DEBOEVERPE              5000   BE0439876885                                           0021403350BE01N EURN030      390-0458705-47    BE22390045870547                  BBRUBEBB   BE14     EI    facturen per post vanaf 2022 -     BELGIE                50-561-0055    0001011245            12250,0020200101            1344.17-BE20021403350D2
 "@
             Invoice = @"
 0021419307BE106001077828BE10202200120220228          141,57          141,572165881081                                        20220429EURBEN3BE10RV2165881081       000000000  6001077828  RMC2165881081
@@ -157,107 +158,96 @@ Describe 'when all tests pass' {
         }
         $testExportedExcelRows = @{
             Debtor  = @(
+                # skip debtor line without CompanyCode
                 @{
-                    DebtorNumber       = '0021999981'
-                    PlantNumber        = 'BE99'
-                    CompanyName        = 'THE FEDERATION'
-                    StreetAddress1     = 'STAR FLEET STREET 9'
-                    PostalCode         = '1234'
-                    City               = 'GALAXY'
-                    StreetAddress2     = 'JEAN-LUC PICARD'
-                    StreetAddress3     = ''
-                    StreetAddress4     = ''
-                    StreetAddress5     = ''
-                    StreetAddress6     = '01'
-                    CountryCode        = 'GA'             
-                    PhoneNumber1       = '0345 12 12 12'
-                    PhoneNumber2       = ''
-                    EmailAddress       = 'piacard@starfleet.com'
-                    FaxNumber          = ''
-                    SearchCode         = 'PICARDJL'
-                    CreditLimit        = '2'
-                    Currency           = 'EUR'
-                    RegistrationNumber = 'BE0xxxx4x688'
-                    URL                = ''
-                    OriginalCustomer   = '0021920781'
-                    AccountGroup       = 'SF01'
-                    CustomerLanguage   = 'F'
-                    DeletionFlag       = ''
-                    CustomerCurrency   = 'EUR'
-                    PaymentTerms       = 'ZBAR'
-                    AccountPosition    = ''
-                    Collection         = ''
-                    AccountNumber      = ''
-                    IBAN               = ''
-                    BIC                = ''
-                    LegalEntity        = 'BE14'
-                    BkGk               = ''
-                    Comment1           = ''
-                    Comment2           = 'EI'
-                    Comment3           = ''
-                    Comment4           = ''
-                    ParentCompany      = ''
-                    DunningClerk       = ''
-                    AccountClerk       = ''
-                    CountryName        = 'WORLD'
-                    DunningNumber      = ''
-                    DbCreditLimit      = '0,00'
-                    NextInReview       = '20210101'
-                    CreditExposure     = '3186.3'
-                    RiskCategory       = '1C0'
-                    CreditAccount      = '11111111'
-                    Rating             = '18'
+                    DebtorNumber          = '0021920631'
+                    CompanyCode           = 'NL30'
+                    Name                  = 'Switch Poeren Realisatie NW-2 VOF'
+                    NameExtra             = 'Project 3487 Wintrack'
+                    Street                = 'Westkanaaldijk 2'
+                    PostalCode            = '3542DA'
+                    City                  = 'UTRECHT'
+                    CountryCode           = 'NL'             
+                    CountryName           = 'NEDERLAND'
+                    PoBox                 = 'POSTBUS 1025'
+                    PoBoxPostalCode       = '3600 BA'
+                    PoBoxCity             = 'MAARSSEN'
+                    PhoneNumber           = '302486911'
+                    MobilePhoneNumber     = ''
+                    EmailAddress          = 'crediteuren.scno@strukton.com'
+                    Comment               = 'EMA    Geen E-invoicing/ KEY'
+                    CreditLimit           = '0'
+                    VatRegistrationNumber = 'NL861210736B01'
+                    AccountGroup          = 'BE01'
+                    CustomerLanguage      = 'N'
+                    PaymentTerms          = 'N060'
+                    DunsNumber            = '49-341-0464'
+                    DbCreditLimit         = '5000,00'
+                    NextInReview          = '20221104'
+                    CreditExposure        = '' # 0
+                    RiskCategory          = '4NL'
+                    CreditAccount         = ''
+                    Rating                = 'O2'
                 }
                 @{
-                    DebtorNumber       = '0029843423'
-                    PlantNumber        = ''
-                    CompanyName        = 'CONTOSO'
-                    StreetAddress1     = 'STREET IN REDMOND 1'
-                    PostalCode         = '9999'
-                    City               = 'REDMOND'
-                    StreetAddress2     = ''
-                    StreetAddress3     = ''
-                    StreetAddress4     = ''
-                    StreetAddress5     = ''
-                    StreetAddress6     = '02'
-                    CountryCode        = 'US'             
-                    PhoneNumber1       = '555 43 33 68'
-                    PhoneNumber2       = '0477 11 11 11'
-                    EmailAddress       = 'info@contoso.com'
-                    FaxNumber          = ''
-                    SearchCode         = 'CNORRIS'
-                    URL                = ''
-                    CreditLimit        = '14000'
-                    Currency           = ''
-                    RegistrationNumber = 'GB5555554536'
-                    OriginalCustomer   = '0021920823'
-                    AccountGroup       = 'US01'
-                    DeletionFlag       = ''
-                    CustomerLanguage   = 'N'
-                    CustomerCurrency   = 'USD'
-                    PaymentTerms       = ''
-                    AccountPosition    = ''
-                    Collection         = ''
-                    AccountNumber      = ''
-                    IBAN               = ''
-                    BIC                = ''
-                    LegalEntity        = 'BE98'
-                    BkGk               = ''
-                    Comment1           = ''
-                    Comment2           = ''
-                    Comment3           = 'EI'
-                    Comment4           = '/also customer 21111114'
-                    ParentCompany      = 'M'
-                    DunningClerk       = ''
-                    AccountClerk       = ''
-                    CountryName        = 'US'
-                    DunningNumber      = '37-003-0021'
-                    DbCreditLimit      = '4250,00'
-                    NextInReview       = '20210101'
-                    CreditExposure     = '7306.5'
-                    RiskCategory       = '0US'
-                    CreditAccount      = '99999999'
-                    Rating             = '99'
+                    DebtorNumber          = '0021510989'
+                    CompanyCode           = 'NL30'
+                    Name                  = 'Den Ouden Aannemingsbedrijf B.V.'
+                    NameExtra             = ''
+                    Street                = 'Hermalen 7'
+                    PostalCode            = '5481 XX'
+                    City                  = 'Schijndel'
+                    CountryCode           = 'NL'             
+                    CountryName           = 'NEDERLAND'
+                    PoBox                 = 'POSTBUS 12'
+                    PoBoxPostalCode       = '5480 AA'
+                    PoBoxCity             = 'MAARSSEN'
+                    PhoneNumber           = '735431000'
+                    MobilePhoneNumber     = ''
+                    EmailAddress          = 'j.bongers@denoudengroep.com'
+                    Comment               = '23.RH'
+                    CreditLimit           = '105875'
+                    VatRegistrationNumber = 'NL801764063B01'
+                    AccountGroup          = 'BE01'
+                    CustomerLanguage      = 'N'
+                    PaymentTerms          = 'N060'
+                    DunsNumber            = '41-589-4518'
+                    Rating                = '2A2'
+                    DbCreditLimit         = '200000,00'
+                    NextInReview          = '20221104'
+                    CreditExposure        = '385574.20' 
+                    RiskCategory          = 'NL1'
+                    CreditAccount         = '21510989'
+                }
+                @{
+                    DebtorNumber          = '0021403350'
+                    CompanyCode           = 'BE10'
+                    Name                  = 'DE BOEVER PETER BVBA'
+                    NameExtra             = ''
+                    Street                = 'RIJKSWEG 66  A'
+                    PostalCode            = '9870'
+                    City                  = 'MACHELEN - ZULTE'
+                    CountryCode           = 'BE'             
+                    CountryName           = 'BELGIE'
+                    PoBox                 = ''
+                    PoBoxPostalCode       = ''
+                    PoBoxCity             = ''
+                    PhoneNumber           = '09/3801923'
+                    MobilePhoneNumber     = '0475/648839'
+                    EmailAddress          = 'info@deboeverbvba.be'
+                    Comment               = 'EI    facturen per post vanaf 2022 -'
+                    CreditLimit           = '5000'
+                    VatRegistrationNumber = 'BE0439876885'
+                    AccountGroup          = 'BE01'
+                    CustomerLanguage      = 'N'
+                    PaymentTerms          = 'N030'
+                    DunsNumber            = '50-561-0055'
+                    Rating                = 'D2'
+                    DbCreditLimit         = '12250,00'
+                    NextInReview          = '20200101'
+                    CreditExposure        = '-1344,17' # convert '1344.17-'
+                    RiskCategory          = 'BE2'
+                    CreditAccount         = '21403350'
                 }
             )
             Invoice = @(
@@ -390,27 +380,19 @@ Describe 'when all tests pass' {
                         $_.SapDocumentNumber -eq $testRow.SapDocumentNumber
                     }
                     @(
-                        'DebtorNumber', 'PlantNumber', 'CompanyName', 
-                        'StreetAddress1', 'PostalCode', 'City', 
-                        'StreetAddress2', 'StreetAddress3',
-                        'StreetAddress4', 'StreetAddress5',
-                        'StreetAddress6', 'CountryCode',
-                        'PhoneNumber1', 'PhoneNumber2',
-                        'EmailAddress', 'FaxNumber',
-                        'SearchCode', 'CreditLimit',
-                        'Currency', 'RegistrationNumber',
-                        'URL', 'OriginalCustomer',
+                        'DebtorNumber', 'CompanyCode',
+                        'Name', 'NameExtra', 
+                        'Street', 'PostalCode',
+                        'City', 'CountryCode', 'CountryName',
+                        'PoBox', 'PoBoxPostalCode',
+                        'PoBoxCity', 'MobilePhoneNumber',
+                        'PhoneNumber', 'MobilePhoneNumber',
+                        'EmailAddress', 'Comment',
+                        'CreditLimit',
+                        'VatRegistrationNumber',
                         'AccountGroup', 'CustomerLanguage',
-                        'DeletionFlag', 'CustomerCurrency',
-                        'PaymentTerms', 'AccountPosition',
-                        'Collection', 'AccountNumber',
-                        'IBAN', 'BIC',
-                        'LegalEntity', 'BkGk',
-                        'Comment1', 'Comment2',
-                        'Comment3', 'Comment4',
-                        'ParentCompany', 'DunningClerk',
-                        'AccountClerk', 'CountryName',
-                        'DunningNumber', 'DbCreditLimit',
+                        'PaymentTerms', 
+                        'DunsNumber', 'DbCreditLimit',
                         'NextInReview', 'CreditExposure',
                         'RiskCategory', 'CreditAccount',
                         'Rating'
@@ -455,7 +437,7 @@ Describe 'when all tests pass' {
         Should -Invoke Send-MailHC -Exactly 1 -Scope Describe -ParameterFilter {
             ($To -eq $testImportFile.MailTo) -and
             ($Bcc -eq $ScriptAdmin) -and
-            ($Subject -eq '2 invoices, 2 debtors') -and
+            ($Subject -eq '6 invoices, 3 debtors') -and
             ($Attachments.Count -eq 3) -and
             ($Attachments[0] -like '* - Converted data.xlsx') -and
             ($Attachments[1] -like '* - Debtor.txt') -and
