@@ -170,20 +170,16 @@ Process {
             try {
                 If ($companyCode = $line.SubString(10, 4).Trim()) {
                     $creditExposure = if (
-                        $sapCreditExposure = $line.SubString(654, 15).Trim()
+                        ($line.length -gt 654) -and
+                        ($sapCreditExposure = $line.SubString(654, 15).Trim())
                     ) {
                         $tmp = $sapCreditExposure.Replace('.', ',')
                         if ($tmp[-1] -eq '-') {
                             '-' + $tmp.Substring(0, $tmp.Length - 1)
                         }
-                        else {
-                            $tmp
-                        }
+                        else { $tmp }
                     }
-                    else {
-                        ''
-                    }
-
+                    else { '' }
 
                     [PSCustomObject]@{
                         DebtorNumber          = $line.SubString(0, 10).Trim()
@@ -213,10 +209,19 @@ Process {
                         }
                         else { '' }
                         DbCreditLimit         = $line.SubString(621, 20).Trim()
-                        NextInReview          = $line.SubString(641, 13).Trim()
+                        NextInReview          = if ($line.length -gt 641) {
+                            $line.SubString(641, 13).Trim()
+                        }
+                        else { '' }
                         CreditExposure        = $creditExposure
-                        RiskCategory          = $line.SubString(669, 3).Trim()
-                        CreditAccount         = $line.SubString(674, 8).Trim()
+                        RiskCategory          = if ($line.Length -gt 669) {
+                            $line.SubString(669, 3).Trim()
+                        }
+                        else { '' }
+                        CreditAccount         = if ($line.length -gt 674) {
+                            $line.SubString(674, 8).Trim()
+                        }
+                        else { '' }
                     }
                 }
             }    
