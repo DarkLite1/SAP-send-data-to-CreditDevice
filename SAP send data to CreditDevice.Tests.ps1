@@ -141,11 +141,12 @@ Describe 'send an e-mail to the admin when' {
 }
 Describe 'when all tests pass' {
     BeforeAll {
-        $testDate = @{
+        $testData = @{
             Debtor  = @"
-0021920631    Switch Poeren Realisatie NW-2 VOF  Westkanaaldijk 2                   3542DA    UTRECHT                            Project 3487 Wintrack              POSTBUS 1025      3600 BA   MAARSSEN                           10 NL 302486911                       crediteuren.scno@strukton.com                                                    SWITCH                     0   NL861210736B01                                         0021920631BE01N EUR                                                                         BE14     EMA    Geen E-invoicing/ KEY        M    NEDERLAND             49-341-0464                           5000,0020221104            43386.04NL10021911144O2
+0021920631NL30Switch Poeren Realisatie NW-2 VOF  Westkanaaldijk 2                   3542DA    UTRECHT                            Project 3487 Wintrack              POSTBUS 1025      3600 BA   MAARSSEN                           10 NL 302486911                       crediteuren.scno@strukton.com                                                    SWITCH                     0   NL861210736B01                                         0021920631BE01N EUR                                                                         BE14     EMA    Geen E-invoicing/ KEY        M    NEDERLAND             49-341-0464                           5000,0020221104            43386.04NL10021911144O2
 0021510989NL30Den Ouden Aannemingsbedrijf B.V.   Hermalen 7                         5481 XX   Schijndel                                                             POSTBUS 12        5480 AA                                      07 NL 735431000                       j.bongers@denoudengroep.com                       735498360                      OUDEN                 105875   NL801764063B01                                         0021510989BE01N EURN060  00010653742800        NL20INGB0653742800                INGBNL2A   BE01  KEY23.RH                                6969NEDERLAND             41-589-4518    510989               200000,0020221104           385574.20NL100215109892A2
 0021403350BE10DE BOEVER PETER BVBA               RIJKSWEG 66  A                     9870      MACHELEN - ZULTE                                                                                                                     08 BE 09/3801923      0475/648839     info@deboeverbvba.be                              09/3801923                     DEBOEVERPE              5000   BE0439876885                                           0021403350BE01N EURN030      390-0458705-47    BE22390045870547                  BBRUBEBB   BE14     EI    facturen per post vanaf 2022 -     BELGIE                50-561-0055    0001011245            12250,0020200101            1344.17-BE20021403350D2
+0021920631    Switch Poeren Realisatie NW-2 VOF  Westkanaaldijk 2                   3542DA    UTRECHT                            Project 3487 Wintrack              POSTBUS 1025      3600 BA   MAARSSEN                           10 NL 302486911                       crediteuren.scno@strukton.com                                                    SWITCH                     0   NL861210736B01                                         0021920631BE01N EUR                                                                         BE14     EMA    Geen E-invoicing/ KEY        M    NEDERLAND             49-341-0464                           5000,0020221104            43386.04NL10021911144O2
 "@
             Invoice = @"
 0021419307BE106001077828BE10202200120220228          141,57          141,572165881081                                        20220429EURBEN3BE10RV2165881081       000000000  6001077828  RMC2165881081
@@ -180,13 +181,13 @@ Describe 'when all tests pass' {
                     VatRegistrationNumber = 'NL861210736B01'
                     AccountGroup          = 'BE01'
                     CustomerLanguage      = 'N'
-                    PaymentTerms          = 'N060'
+                    PaymentTerms          = ''
                     DunsNumber            = '49-341-0464'
                     DbCreditLimit         = '5000,00'
                     NextInReview          = '20221104'
-                    CreditExposure        = '' # 0
-                    RiskCategory          = '4NL'
-                    CreditAccount         = ''
+                    CreditExposure        = '43386,04'
+                    RiskCategory          = 'NL1'
+                    CreditAccount         = '21911144'
                     Rating                = 'O2'
                 }
                 @{
@@ -201,7 +202,7 @@ Describe 'when all tests pass' {
                     CountryName           = 'NEDERLAND'
                     PoBox                 = 'POSTBUS 12'
                     PoBoxPostalCode       = '5480 AA'
-                    PoBoxCity             = 'MAARSSEN'
+                    PoBoxCity             = ''
                     PhoneNumber           = '735431000'
                     MobilePhoneNumber     = ''
                     EmailAddress          = 'j.bongers@denoudengroep.com'
@@ -215,7 +216,7 @@ Describe 'when all tests pass' {
                     Rating                = '2A2'
                     DbCreditLimit         = '200000,00'
                     NextInReview          = '20221104'
-                    CreditExposure        = '385574.20' 
+                    CreditExposure        = '385574,20' 
                     RiskCategory          = 'NL1'
                     CreditAccount         = '21510989'
                 }
@@ -347,8 +348,8 @@ Describe 'when all tests pass' {
             )
         }
 
-        $testDate.Debtor | Out-File -FilePath $testImportFile.DebtorFile
-        $testDate.Invoice | Out-File -FilePath $testImportFile.InvoiceFile
+        $testData.Debtor | Out-File -FilePath $testImportFile.DebtorFile
+        $testData.Invoice | Out-File -FilePath $testImportFile.InvoiceFile
         
         .$testScript @testParams
     }
@@ -377,16 +378,15 @@ Describe 'when all tests pass' {
             It 'with the correct data in the rows' {
                 foreach ($testRow in $testExportedExcelRows.Debtor) {
                     $actualRow = $actual | Where-Object {
-                        $_.SapDocumentNumber -eq $testRow.SapDocumentNumber
+                        $_.DebtorNumber -eq $testRow.DebtorNumber
                     }
                     @(
-                        'DebtorNumber', 'CompanyCode',
+                        'CompanyCode',
                         'Name', 'NameExtra', 
                         'Street', 'PostalCode',
                         'City', 'CountryCode', 'CountryName',
-                        'PoBox', 'PoBoxPostalCode',
-                        'PoBoxCity', 'MobilePhoneNumber',
-                        'PhoneNumber', 'MobilePhoneNumber',
+                        'PoBox', 'PoBoxPostalCode','PoBoxCity', 
+                        'MobilePhoneNumber','PhoneNumber', 
                         'EmailAddress', 'Comment',
                         'CreditLimit',
                         'VatRegistrationNumber',
@@ -400,7 +400,7 @@ Describe 'when all tests pass' {
                         $actualRow.$_ | Should -Be $testRow.$_
                     }
                 }
-            }
+            } -tag test
         }
         Context "with worksheet 'Invoice'" {
             BeforeAll {
@@ -445,5 +445,5 @@ Describe 'when all tests pass' {
             #  -and
             # ($Body -like "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*")
         }
-    } -Tag test
+    }
 }
