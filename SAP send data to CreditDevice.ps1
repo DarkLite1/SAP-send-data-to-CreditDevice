@@ -363,7 +363,7 @@ Process {
             "<p>First test on converting data</p>
                 <p><i>* Check the attachment for details</i></p>"
         }
-        # Send-MailHC @mailParams
+        Send-MailHC @mailParams
         #endregion
     }
     catch {

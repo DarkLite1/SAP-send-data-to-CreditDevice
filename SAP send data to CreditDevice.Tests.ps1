@@ -429,7 +429,7 @@ Describe 'when all tests pass' {
                         $actualRow.$_ | Should -Be $testRow.$_
                     }
                 }
-            } -tag test
+            }
         }
     }
     It 'send a summary mail to the user' {
@@ -444,5 +444,5 @@ Describe 'when all tests pass' {
             #  -and
             # ($Body -like "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*")
         }
-    }
+    } -tag test
 }
