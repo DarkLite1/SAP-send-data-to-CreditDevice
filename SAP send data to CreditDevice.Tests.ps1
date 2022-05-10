@@ -252,10 +252,9 @@ Describe 'when all tests pass' {
                 }
             )
             Invoice = @(
+                # documentType RV | DB, InvoiceNumber = Reference
+                # documentType DM | DC, InvoiceNumber = SapDocumentNumber
                 @{
-                    # documentType RV | DB, InvoiceNumber = Reference
-                    # documentType DM | DC, InvoiceNumber = SapDocumentNumber
-                    
                     # documentType RV
                     SapDocumentNumber = '6001077828'
                     DebtorNumber      = '0021419307'
@@ -264,7 +263,7 @@ Describe 'when all tests pass' {
                     DocumentType      = 'RV'
                     Reference         = '2165881081'
                     InvoiceNumber     = '2165881081'
-                    Description       = ''
+                    Description       = '2165881081'
                     DocumentDate      = '20220228'
                     NetDueDate        = '20220429'
                     Amount            = '141,57'
@@ -279,7 +278,7 @@ Describe 'when all tests pass' {
                     DocumentType      = 'RV'
                     Reference         = '2190485876'
                     InvoiceNumber     = '2190485876'
-                    Description       = ''
+                    Description       = '2190485876'
                     DocumentDate      = '20220314'
                     NetDueDate        = '20220430'
                     Amount            = '18783,42'
@@ -294,7 +293,7 @@ Describe 'when all tests pass' {
                     DocumentType      = 'DM'
                     Reference         = ''
                     InvoiceNumber     = '5100000446'
-                    Description       = ''
+                    Description       = '5100000446'
                     DocumentDate      = '20210831'
                     NetDueDate        = '20211031'
                     Amount            = '370,20'
@@ -324,7 +323,7 @@ Describe 'when all tests pass' {
                     DocumentType      = 'DZ'
                     Reference         = ''
                     InvoiceNumber     = ''
-                    Description       = 'DB2165721342  31/12/2020  (17/01/2021}'
+                    Description       = 'DB2165721342  31/12/2020  (17/01/2021)'
                     DocumentDate      = '20210129'
                     NetDueDate        = '20210129'
                     Amount            = '-84,10'
@@ -338,7 +337,7 @@ Describe 'when all tests pass' {
                     BusinessArea      = 'BE6Y'
                     DocumentType      = 'DM'
                     Reference         = ''
-                    InvoiceNumber     = '4900006280'
+                    InvoiceNumber     = '5100000161'
                     Description       = '5100000161'
                     DocumentDate      = '20220331'
                     NetDueDate        = '20220430'
@@ -400,7 +399,7 @@ Describe 'when all tests pass' {
                         $actualRow.$_ | Should -Be $testRow.$_
                     }
                 }
-            } -tag test
+            }
         }
         Context "with worksheet 'Invoice'" {
             BeforeAll {
@@ -430,7 +429,7 @@ Describe 'when all tests pass' {
                         $actualRow.$_ | Should -Be $testRow.$_
                     }
                 }
-            }
+            } -tag test
         }
     }
     It 'send a summary mail to the user' {
