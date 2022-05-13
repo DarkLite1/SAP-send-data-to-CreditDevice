@@ -1,5 +1,5 @@
 {
   "MailTo": ["bob@contoso.com"],
-  "DebtorFile": "c:\\debtors.txt",
-  "InvoiceFile": "c:\\invoices.txt"
+  "DebtorFiles": ["c:\\debtorsA.txt", "c:\\debtorsB.txt"],
+  "InvoiceFiles": ["c:\\invoicesA.txt", "c:\\invoicesB.txt"]
 }

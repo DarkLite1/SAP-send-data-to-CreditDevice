@@ -375,15 +375,6 @@ Process {
             NoNumberConversion = '*'
         }
 
-        $mailParams = @{
-            To          = $file.MailTo
-            Bcc         = $ScriptAdmin
-            Attachments = @($excelParams.Path)
-            LogFolder   = $LogParams.LogFolder
-            Header      = $ScriptName
-            Save        = $LogFile + ' - Mail.html'
-        }
-
         #region Copy source file Debtor.txt to log folder
         $M = "Copy debtor source file '$($file.DebtorFile)' to log folder"
         Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
@@ -394,8 +385,6 @@ Process {
             ErrorAction = 'Stop'
         }
         Copy-Item @copyParams
-
-        $mailParams.Attachments += $copyParams.Destination
         #endregion
 
         #region Copy source file Invoice.txt to log folder
@@ -408,8 +397,6 @@ Process {
             ErrorAction = 'Stop'
         }
         Copy-Item @copyParams
-
-        $mailParams.Attachments += $copyParams.Destination
         #endregion
 
         #region Get debtor and invoice file content
@@ -579,16 +566,63 @@ Process {
         }
         Send-DataToCreditDeviceHC @sendParams
         #endregion
+    }
+    catch {
+        Write-Warning $_
+        Send-MailHC -To $ScriptAdmin -Subject 'FAILURE' -Priority 'High' -Message $_ -Header $ScriptName
+        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"
+        Write-EventLog @EventEndParams; Exit 1
+    }
+}
 
-        #region Send mail to end user
-        $mailParams += @{
-            Subject = '{0} invoices, {1} debtors' -f 
+End {
+    try { 
+        $mailParams = @{
+            To          = $file.MailTo
+            Bcc         = $ScriptAdmin
+            Subject     = '{0} invoices, {1} debtors' -f 
             $fileContent.invoice.converted.Count,
             $fileContent.debtor.converted.Count
-            Message =
-            "<p>First test on converting data</p>
-                <p><i>* Check the attachment for details</i></p>"
+            Attachments = $excelParams.Path
+            LogFolder   = $LogParams.LogFolder
+            Header      = $ScriptName
+            Save        = $LogFile + ' - Mail.html'
+            Priority    = 'Normal'
         }
+
+        #region Set mail subject and priority
+        $systemErrors = $Error.Exception.Message | 
+        Where-Object { $_ } | Get-Unique
+    
+        if ($systemErrors) {
+            $mailParams.Subject = "{0} error{1}, {2}" -f 
+            $systemErrors.Count, $(if ($systemErrors.Count -ge 2) { 's' }), 
+            $mailParams.Subject 
+            $mailParams.Priority = 'High'
+        }
+        #endregion
+    
+        #region Create system errors HTML list
+        $htmlSystemErrorsList = $null
+    
+        if ($systemErrors) {
+            $systemErrors | ForEach-Object {
+                Write-EventLog @EventErrorParams -Message $_
+            }
+    
+            $htmlSystemErrorsList = $systemErrors | 
+            ConvertTo-HtmlListHC -Spacing Wide -Header 'System errors:'
+        }
+        #endregion
+    
+        #region Send mail to end user
+        $mailParams.Message = "
+        $htmlSystemErrorsList
+        <p>First test on converting data</p>
+            <p><i>* Check the attachment for details</i></p>
+        "
+
+        Get-ScriptRuntimeHC -Stop
         Send-MailHC @mailParams
         #endregion
     }

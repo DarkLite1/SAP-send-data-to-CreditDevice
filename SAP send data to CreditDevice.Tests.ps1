@@ -467,9 +467,7 @@ Describe 'when all tests pass' {
             ($Bcc -eq $ScriptAdmin) -and
             ($Subject -eq '6 invoices, 3 debtors') -and
             ($Attachments.Count -eq 3) -and
-            ($Attachments[0] -like '* - Converted data.xlsx') -and
-            ($Attachments[1] -like '* - Debtor.txt') -and
-            ($Attachments[2] -like '* - Invoice.txt')
+            ($Attachments[0] -like '* - Converted data.xlsx')
             #  -and
             # ($Body -like "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*")
         }
