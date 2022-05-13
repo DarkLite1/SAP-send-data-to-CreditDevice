@@ -447,6 +447,20 @@ Describe 'when all tests pass' {
             }
         }
     }
+    Context 'Send-DataToCreditDeviceHC is called' {
+        It 'to upload debtor data to CreditDevice' {
+            Should -Invoke Send-DataToCreditDeviceHC -Scope Describe -Times 1 -Exactly -ParameterFilter {
+                ($Data.Count -eq $testExportedExcelRows.Debtor.Count) -and
+                ($Type -eq 'Debtor')
+            }
+        }
+        It 'to upload invoice data to CreditDevice' {
+            Should -Invoke Send-DataToCreditDeviceHC -Scope Describe -Times 1 -Exactly -ParameterFilter {
+                ($Data.Count -eq $testExportedExcelRows.Invoice.Count) -and
+                ($Type -eq 'Invoice')
+            }
+        }
+    }
     It 'send a summary mail to the user' {
         Should -Invoke Send-MailHC -Exactly 1 -Scope Describe -ParameterFilter {
             ($To -eq $testImportFile.MailTo) -and
