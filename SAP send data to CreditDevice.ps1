@@ -583,8 +583,8 @@ Process {
         #region Send mail to end user
         $mailParams += @{
             Subject = '{0} invoices, {1} debtors' -f 
-            ($fileContent.invoice.converted | Measure-Object).Count,
-            ($fileContent.debtor.converted | Measure-Object).Count
+            $fileContent.invoice.converted.Count,
+            $fileContent.debtor.converted.Count
             Message =
             "<p>First test on converting data</p>
                 <p><i>* Check the attachment for details</i></p>"
