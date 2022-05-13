@@ -29,6 +29,7 @@ Param (
     [String]$ScriptName,
     [Parameter(Mandatory)]
     [String]$ImportFile,
+    [String]$Token = $env:CREDIT_DEVICE_API_TOKEN,
     [String]$LogFolder = "$env:POWERSHELL_LOG_FOLDER\Application specific\SAP\$ScriptName",
     [String]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
@@ -103,7 +104,7 @@ Begin {
             [PSCustomObject[]]$Data,
             [Int]$MaxUploadsAtOnce = 4000,
             [Int]$ThrottleLimit = 4,
-            [TimeSpan]$Timeout = (New-TimeSpan -Minutes 30)
+            [TimeSpan]$Timeout = (New-TimeSpan -Minutes 45)
         )
 
         try {
@@ -503,6 +504,15 @@ Process {
         Write-Verbose $M; Write-EventLog @EventOutParams -Message $M
         #endregion
 
+        #region Send debtor data to CreditDevice
+        $sendParams = @{
+            Token = $Token
+            Type  = 'Debtor'
+            Data  = $fileContent.debtor.converted
+        }
+        Send-DataToCreditDeviceHC @sendParams
+        #endregion
+
         #region Convert invoice file to objects
         $M = "Convert invoice file '$($file.InvoiceFile)' to objects"
         Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
@@ -557,6 +567,15 @@ Process {
 
         $M = "Exported '$($fileContent.invoice.converted.Count)' rows to Excel file '$($excelParams.Path)'"
         Write-Verbose $M; Write-EventLog @EventOutParams -Message $M
+        #endregion
+
+        #region Send invoice data to CreditDevice
+        $sendParams = @{
+            Token = $Token
+            Type  = 'Invoice'
+            Data  = $fileContent.invoice.converted
+        }
+        Send-DataToCreditDeviceHC @sendParams
         #endregion
 
         #region Send mail to end user
