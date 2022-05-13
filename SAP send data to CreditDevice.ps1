@@ -341,21 +341,25 @@ Begin {
         }
         #endregion
 
-        #region DebtorFile
-        if (-not $file.DebtorFile) {
-            throw "Input file '$ImportFile': Property 'DebtorFile' is missing"
+        #region DebtorFiles
+        if (-not $file.DebtorFiles) {
+            throw "Input file '$ImportFile': Property 'DebtorFiles' is missing"
         }
-        if (-not (Test-Path -LiteralPath $file.DebtorFile -PathType Leaf)) {
-            throw "Input file '$ImportFile': Debtor file '$($file.DebtorFile)' not found"
+        foreach ($debtorFile in $file.DebtorFiles) {
+            if (-not (Test-Path -LiteralPath $debtorFile -PathType Leaf)) {
+                throw "Input file '$ImportFile': Debtor file '$debtorFile' not found"
+            }
         }
         #endregion
 
-        #region InvoiceFile
-        if (-not $file.InvoiceFile) {
-            throw "Input file '$ImportFile': Property 'InvoiceFile' is missing"
+        #region InvoiceFiles
+        if (-not $file.InvoiceFiles) {
+            throw "Input file '$ImportFile': Property 'InvoiceFiles' is missing"
         }
-        if (-not (Test-Path -LiteralPath $file.InvoiceFile -PathType Leaf)) {
-            throw "Input file '$ImportFile': Invoice file '$($file.InvoiceFile)' not found"
+        foreach ($invoiceFile in $file.InvoiceFiles) {
+            if (-not (Test-Path -LiteralPath $invoiceFile -PathType Leaf)) {
+                throw "Input file '$ImportFile': Invoice file '$invoiceFile' not found"
+            }
         }
         #endregion
         #endregion
@@ -377,50 +381,69 @@ Process {
             NoNumberConversion = '*'
         }
 
-        #region Copy source file Debtor.txt to log folder
-        $M = "Copy debtor source file '$($file.DebtorFile)' to log folder"
-        Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
-
-        $copyParams = @{
-            Path        = $file.DebtorFile
-            Destination = $LogFile + ' - Debtor.txt'
-            ErrorAction = 'Stop'
-        }
-        Copy-Item @copyParams
-        #endregion
-
-        #region Copy source file Invoice.txt to log folder
-        $M = "Copy invoice source file '$($file.InvoiceFile)' to log folder"
-        Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
-
-        $copyParams = @{
-            Path        = $file.InvoiceFile
-            Destination = $LogFile + ' - Invoice.txt'
-            ErrorAction = 'Stop'
-        }
-        Copy-Item @copyParams
-        #endregion
-
-        #region Get debtor and invoice file content
         $fileContent = @{
             debtor  = @{
-                raw       = Get-Content -LiteralPath $file.DebtorFile -Encoding UTF8
+                raw       = @()
                 converted = [System.Collections.ArrayList]@()
             }
             invoice = @{
-                raw       = Get-Content -LiteralPath $file.InvoiceFile -Encoding UTF8
+                raw       = @()
                 converted = [System.Collections.ArrayList]@()
             }
         }
-    
-        $M = "Imported rows: debtor file '{0}' invoice file '{1}'" -f 
-        ($fileContent.debtor.raw | Measure-Object).Count,
-        ($fileContent.invoice.raw | Measure-Object).Count
-        Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
-        #endregion
+        
+        for ($i = 0; $i -lt $file.DebtorFiles.Count; $i++) {
+            #region Get debtor file content
+            $M = "Get content debtor file '{0}'" -f $file.DebtorFiles[$i]
+            Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
+            
+            $getParams = @{
+                LiteralPath = $file.DebtorFiles[$i]
+                Encoding    = 'UTF8'
+            }
+            $fileContent.debtor.raw += Get-Content @getParams
+            #endregion
 
-        #region Convert debtor file to objects
-        $M = "Convert file debtor '$($file.DebtorFile)' to objects"
+            #region Copy debtor file to log folder
+            $M = "Copy debtor file '{0}' to log folder" -f $file.DebtorFiles[$i]
+            Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
+
+            $copyParams = @{
+                Path        = $file.DebtorFiles[$i]
+                Destination = '{0} - Debtor {1}.txt' -f $LogFile, $i
+                ErrorAction = 'Stop'
+            }
+            Copy-Item @copyParams
+            #endregion
+        }
+
+        for ($i = 0; $i -lt $file.InvoiceFiles.Count; $i++) {
+            #region Get invoice file content
+            $M = "Get content invoice file '{0}'" -f $file.InvoiceFiles[$i]
+            Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
+            
+            $getParams = @{
+                LiteralPath = $file.InvoiceFiles[$i]
+                Encoding    = 'UTF8'
+            }
+            $fileContent.invoice.raw += Get-Content @getParams
+            #endregion
+
+            #region Copy invoice file to log folder
+            $M = "Copy invoice file '{0}' to log folder" -f $file.InvoiceFiles[$i]
+            Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
+
+            $copyParams = @{
+                Path        = $file.InvoiceFiles[$i]
+                Destination = '{0} - Invoice {1}.txt' -f $LogFile, $i
+                ErrorAction = 'Stop'
+            }
+            Copy-Item @copyParams
+            #endregion
+        }
+
+        #region Convert debtor strings to objects
+        $M = "Convert '$($fileContent.debtor.raw.Count)' debtor strings to objects"
         Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
             
         foreach (
@@ -486,7 +509,7 @@ Process {
         }
         #endregion
 
-        #region Export debtor file to Excel
+        #region Export debtor data to Excel
         $excelParams.WorksheetName = 'Debtor'
         $excelParams.TableName = 'Debtor'
         $fileContent.debtor.converted | Export-Excel @excelParams
@@ -504,8 +527,8 @@ Process {
         Send-DataToCreditDeviceHC @sendParams
         #endregion
 
-        #region Convert invoice file to objects
-        $M = "Convert invoice file '$($file.InvoiceFile)' to objects"
+        #region Convert invoice strings to objects
+        $M = "Convert '$($fileContent.invoice.raw.Count)' invoice strings to objects"
         Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
             
         foreach (

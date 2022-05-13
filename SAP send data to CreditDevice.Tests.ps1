@@ -8,9 +8,13 @@ BeforeAll {
     }
 
     $testImportFile = @{
-        MailTo      = 'bob@contoso.com'
-        DebtorFile  = (New-Item "TestDrive:/deb.txt" -ItemType File).FullName
-        InvoiceFile = (New-Item "TestDrive:/inv.txt" -ItemType File).FullName
+        MailTo       = 'bob@contoso.com'
+        DebtorFiles  = @(
+            (New-Item "TestDrive:/deb.txt" -ItemType File).FullName
+        )
+        InvoiceFiles = @(
+            (New-Item "TestDrive:/inv.txt" -ItemType File).FullName
+        )
     }
     $testImportFile | ConvertTo-Json -Depth 5 | Out-File @testOutParams
     
@@ -95,57 +99,59 @@ Describe 'send an e-mail to the admin when' {
                     $EntryType -eq 'Error'
                 }
             }
-            It 'DebtorFile is missing' {
+            It 'DebtorFiles is missing' {
                 $testNewImportFile = $testImportFile.Clone()
-                $testNewImportFile.DebtorFile = $null
+                $testNewImportFile.DebtorFiles = $null
                 $testNewImportFile | ConvertTo-Json | Out-File @testOutParams
                 
                 .$testScript @testParams
                 
                 Should -Invoke Send-MailHC -Exactly 1 -ParameterFilter {
-                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Property 'DebtorFile' is missing*")
+                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Property 'DebtorFiles' is missing*")
                 }
                 Should -Invoke Write-EventLog -Exactly 1 -ParameterFilter {
                     $EntryType -eq 'Error'
                 }
             }
-            It 'DebtorFile path does not exist' {
+            It 'DebtorFiles path does not exist' {
                 $testNewImportFile = $testImportFile.Clone()
-                $testNewImportFile.DebtorFile = 'TestDrive:/NotExisting.txt'
+                $testNewImportFile.DebtorFiles = @('TestDrive:/NotExisting.txt')
                 $testNewImportFile | ConvertTo-Json | Out-File @testOutParams
                 
                 .$testScript @testParams
                 
                 Should -Invoke Send-MailHC -Exactly 1 -ParameterFilter {
-                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Debtor file '$($testNewImportFile.DebtorFile)' not found*")
+                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Debtor file '$($testNewImportFile.DebtorFiles[0])' not found*")
                 }
                 Should -Invoke Write-EventLog -Exactly 1 -ParameterFilter {
                     $EntryType -eq 'Error'
                 }
             }
-            It 'InvoiceFile is missing' {
+            It 'InvoiceFiles is missing' {
                 $testNewImportFile = $testImportFile.Clone()
-                $testNewImportFile.InvoiceFile = $null
+                $testNewImportFile.InvoiceFiles = $null
                 $testNewImportFile | ConvertTo-Json | Out-File @testOutParams
                 
                 .$testScript @testParams
                 
                 Should -Invoke Send-MailHC -Exactly 1 -ParameterFilter {
-                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Property 'InvoiceFile' is missing*")
+                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Property 'InvoiceFiles' is missing*")
                 }
                 Should -Invoke Write-EventLog -Exactly 1 -ParameterFilter {
                     $EntryType -eq 'Error'
                 }
             }
-            It 'InvoiceFile path does not exist' {
+            It 'InvoiceFiles path does not exist' {
                 $testNewImportFile = $testImportFile.Clone()
-                $testNewImportFile.InvoiceFile = 'TestDrive:/NotExisting.txt'
+                $testNewImportFile.InvoiceFiles = @(
+                    'TestDrive:/NotExisting.txt'
+                )
                 $testNewImportFile | ConvertTo-Json | Out-File @testOutParams
                 
                 .$testScript @testParams
                 
                 Should -Invoke Send-MailHC -Exactly 1 -ParameterFilter {
-                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Invoice file '$($testNewImportFile.InvoiceFile)' not found*")
+                    (&$MailAdminParams) -and ($Message -like "*$ImportFile*Invoice file '$($testNewImportFile.InvoiceFiles[0])' not found*")
                 }
                 Should -Invoke Write-EventLog -Exactly 1 -ParameterFilter {
                     $EntryType -eq 'Error'
@@ -362,17 +368,17 @@ Describe 'when all tests pass' {
             )
         }
 
-        $testData.Debtor | Out-File -FilePath $testImportFile.DebtorFile
-        $testData.Invoice | Out-File -FilePath $testImportFile.InvoiceFile
+        $testData.Debtor | Out-File -FilePath $testImportFile.DebtorFiles[0]
+        $testData.Invoice | Out-File -FilePath $testImportFile.InvoiceFiles[0]
         
         .$testScript @testParams
     }
     Context 'copy source files to log folder' {
         It 'Debtor.txt' {
-            Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Debtor.txt' | Should -Not -BeNullOrEmpty
+            Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Debtor 0.txt' | Should -Not -BeNullOrEmpty
         }
         It 'Invoice.txt' {
-            Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Invoice.txt' | Should -Not -BeNullOrEmpty
+            Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Invoice 0.txt' | Should -Not -BeNullOrEmpty
         }
     }
     Context 'export an Excel file' {
@@ -472,4 +478,4 @@ Describe 'when all tests pass' {
             # ($Body -like "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*")
         }
     } -Tag test
-}
+} -Tag test
