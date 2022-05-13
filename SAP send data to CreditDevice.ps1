@@ -506,7 +506,7 @@ Process {
                 }
             }    
             catch {
-                Write-Warning "Failed converting debtor data '$line': $_"
+                Write-Error "Failed converting debtor data '$line': $_"
             }
         }
         #endregion
@@ -526,7 +526,7 @@ Process {
             Type  = 'Debtor'
             Data  = $fileContent.debtor.converted
         }
-        Send-DataToCreditDeviceHC @sendParams
+        # Send-DataToCreditDeviceHC @sendParams
         #endregion
 
         #region Convert invoice strings to objects
@@ -571,7 +571,7 @@ Process {
                 )
             }    
             catch {
-                Write-Warning "Failed converting invoice data '$line': $_"
+                Write-Error "Failed converting invoice data '$line': $_"
             }
         }
         #endregion
