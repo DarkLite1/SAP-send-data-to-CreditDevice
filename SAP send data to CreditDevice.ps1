@@ -310,6 +310,8 @@ Begin {
         Write-EventLog @EventStartParams
         Get-ScriptRuntimeHC -Start
 
+        $error.Clear()
+
         #region Logging
         try {
             $LogParams = @{
@@ -369,7 +371,7 @@ Begin {
 Process {
     try {
         $excelParams = @{
-            Path               = $LogFile + ' - Converted data.xlsx'
+            Path               = $LogFile + ' - Data.xlsx'
             AutoSize           = $true
             FreezeTopRow       = $true
             NoNumberConversion = '*'

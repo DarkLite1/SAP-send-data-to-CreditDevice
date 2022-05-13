@@ -377,7 +377,7 @@ Describe 'when all tests pass' {
     }
     Context 'export an Excel file' {
         BeforeAll {
-            $testExcelLogFile = Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Converted data.xlsx'
+            $testExcelLogFile = Get-ChildItem $testParams.LogFolder -File -Recurse -Filter '* - Data.xlsx'
         }
         It 'to the log folder' {
             $testExcelLogFile | Should -Not -BeNullOrEmpty
@@ -466,8 +466,8 @@ Describe 'when all tests pass' {
             ($To -eq $testImportFile.MailTo) -and
             ($Bcc -eq $ScriptAdmin) -and
             ($Subject -eq '6 invoices, 3 debtors') -and
-            ($Attachments.Count -eq 3) -and
-            ($Attachments[0] -like '* - Converted data.xlsx')
+            ($Attachments.Count -eq 1) -and
+            ($Attachments -like '* - Data.xlsx')
             #  -and
             # ($Body -like "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*")
         }
