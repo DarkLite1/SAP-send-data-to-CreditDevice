@@ -381,6 +381,7 @@ Process {
             NoNumberConversion = '*'
         }
 
+        #region Get source data from files and copy to log folder
         $fileContent = @{
             debtor  = @{
                 raw       = @()
@@ -441,6 +442,7 @@ Process {
             Copy-Item @copyParams
             #endregion
         }
+        #endregion
 
         #region Convert debtor strings to objects
         $M = "Convert '$($fileContent.debtor.raw.Count)' debtor strings to objects"
