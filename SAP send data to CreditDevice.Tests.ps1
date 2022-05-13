@@ -21,6 +21,21 @@ BeforeAll {
         LogFolder  = New-Item 'TestDrive:/log' -ItemType Directory
     }
 
+    Function Send-DataToCreditDeviceHC {
+        Param (
+            [Parameter(Mandatory)]
+            [String]$Token,
+            [Parameter(Mandatory)]
+            [ValidateSet('Debtor', 'Invoice')]
+            [String]$Type,
+            [Parameter(Mandatory)]
+            [PSCustomObject[]]$Data,
+            [Int]$MaxUploadsAtOnce = 4000,
+            [Int]$ThrottleLimit = 4,
+            [TimeSpan]$Timeout = (New-TimeSpan -Minutes 45)
+        )
+    }
+    Mock Send-DataToCreditDeviceHC
     Mock Send-MailHC
     Mock Write-EventLog
 }
@@ -384,8 +399,8 @@ Describe 'when all tests pass' {
                         'Name', 'NameExtra', 
                         'Street', 'PostalCode',
                         'City', 'CountryCode', 'CountryName',
-                        'PoBox', 'PoBoxPostalCode','PoBoxCity', 
-                        'MobilePhoneNumber','PhoneNumber', 
+                        'PoBox', 'PoBoxPostalCode', 'PoBoxCity', 
+                        'MobilePhoneNumber', 'PhoneNumber', 
                         'EmailAddress', 'Comment',
                         'CreditLimit',
                         'VatRegistrationNumber',
@@ -444,5 +459,5 @@ Describe 'when all tests pass' {
             #  -and
             # ($Body -like "<p>Dear supplier</p><p>Since delivery date <b>15/03/2022</b> there have been <b>2 deliveries</b>.</p><p><i>* Check the attachment for details</i></p>*")
         }
-    } -tag test
+    } -Tag test
 }

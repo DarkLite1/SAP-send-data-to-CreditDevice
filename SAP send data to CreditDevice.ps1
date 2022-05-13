@@ -166,6 +166,8 @@ Begin {
                     [Parameter(Mandatory)]
                     [TimeSpan]$Timeout,
                     [Parameter(Mandatory)]
+                    [String]$Type,
+                    [Parameter(Mandatory)]
                     [Int]$DefinitionID,
                     [Parameter(Mandatory)]
                     [PSCustomObject[]]$DataChunk
@@ -207,7 +209,7 @@ Begin {
                     }
                 }
                 catch {
-                    throw "Failed to create an import transaction for definition number '$definitionID': $_"
+                    throw "Failed to create an import transaction for type '$Type' with definition number '$definitionID': $_"
                 }
                 #endregion
         
@@ -233,7 +235,7 @@ Begin {
                     $importTransaction.result = Invoke-RestMethod @params
                 }
                 catch {
-                    throw "Failed to start the import for definition number '$definitionID' with transaction id '$($importTransaction.id)': $_"
+                    throw "Failed to start the import for type '$Type' with  definition number '$definitionID' and transaction id '$($importTransaction.id)': $_"
                 }
                 #endregion
 
@@ -266,7 +268,7 @@ Begin {
                     }
                 }
                 catch {
-                    throw "Failed to check for the import status of transaction id '$($importTransaction.id)' with import definition '$definitionID': $_"
+                    throw "Failed to check for the import status of type '$Type' with transaction id '$($importTransaction.id)' and import definition '$definitionID': $_"
                 }
                 #endregion
             }
@@ -287,7 +289,7 @@ Begin {
 
                 $jobParams = @{
                     ScriptBlock  = $scriptBlock 
-                    ArgumentList = $Token, $Timeout, $definitionID, $Data[$i..$end]
+                    ArgumentList = $Token, $Timeout, $Type, $definitionID, $Data[$i..$end]
                 }
                 $jobs += Start-Job @jobParams
                 Wait-MaxRunningJobsHC -Name $jobs -MaxThreads $ThrottleLimit
