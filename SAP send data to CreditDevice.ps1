@@ -512,12 +512,12 @@ Process {
         #endregion
 
         #region Export debtor data to Excel
+        $M = "Export '$($fileContent.debtor.converted.Count)' debtor rows to Excel file '$($excelParams.Path)'"
+        Write-Verbose $M; Write-EventLog @EventOutParams -Message $M
+
         $excelParams.WorksheetName = 'Debtor'
         $excelParams.TableName = 'Debtor'
         $fileContent.debtor.converted | Export-Excel @excelParams
-
-        $M = "Exported '$($fileContent.debtor.converted.Count)' rows to Excel file '$($excelParams.Path)'"
-        Write-Verbose $M; Write-EventLog @EventOutParams -Message $M
         #endregion
 
         #region Send debtor data to CreditDevice
@@ -576,13 +576,13 @@ Process {
         }
         #endregion
 
-        #region Export invoice file to Excel
+        #region Export invoice objects to Excel
+        $M = "Export '$($fileContent.invoice.converted.Count)' invoice rows to Excel file '$($excelParams.Path)'"
+        Write-Verbose $M; Write-EventLog @EventOutParams -Message $M
+        
         $excelParams.WorksheetName = 'Invoice'
         $excelParams.TableName = 'Invoice'
         $fileContent.invoice.converted | Export-Excel @excelParams
-
-        $M = "Exported '$($fileContent.invoice.converted.Count)' rows to Excel file '$($excelParams.Path)'"
-        Write-Verbose $M; Write-EventLog @EventOutParams -Message $M
         #endregion
 
         #region Send invoice data to CreditDevice
