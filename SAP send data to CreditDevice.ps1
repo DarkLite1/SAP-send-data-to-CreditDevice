@@ -194,11 +194,10 @@ Begin {
                             Accept        = 'application/json'
                         }
                         # UseBasicParsing = $true
-                        Body        = [System.Text.Encoding]::UTF8.GetBytes((
-                                @{
-                                    id = $DefinitionID
-                                } | ConvertTo-Json
-                            )
+                        Body        = (
+                            @{
+                                id = $DefinitionID
+                            } | ConvertTo-Json
                         )
                         Verbose     = $false
                     }
@@ -226,10 +225,7 @@ Begin {
                             Authorization = "Bearer $Token" 
                             Accept        = 'application/json'
                         }
-                        Body        = [System.Text.Encoding]::UTF8.GetBytes((
-                                $DataChunk | ConvertTo-Json
-                            )
-                        )
+                        Body        = $DataChunk | ConvertTo-Json
                         Verbose     = $false
                     }
                     $importTransaction.result = Invoke-RestMethod @params
