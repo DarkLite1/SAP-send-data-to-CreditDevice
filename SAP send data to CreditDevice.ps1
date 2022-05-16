@@ -80,13 +80,6 @@ Begin {
 
         .PARAMETER Data
             Contains the data that needs to be send to the CreditDevice API.
-        
-        .PARAMETER MaxUploadsAtOnce
-            Used to split-up the data sent to the CreditDevice API so we don't 
-            spam it with one big chunk of data all at once.
-        
-        .PARAMETER ThrottleLimit
-            The maximum of uploads we execute at the same time.
 
         .PARAMETER Timeout
             The time to wait for the CreditDevice API to return a response of 
@@ -102,8 +95,6 @@ Begin {
             [String]$Type,
             [Parameter(Mandatory)]
             [PSCustomObject[]]$Data,
-            [Int]$MaxUploadsAtOnce = 4000,
-            [Int]$ThrottleLimit = 4,
             [TimeSpan]$Timeout = (New-TimeSpan -Minutes 45)
         )
 
@@ -117,7 +108,7 @@ Begin {
             #region Test token valid
             try {
                 $M = 'Test token valid'
-                Write-Verbose $M
+                Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
 
                 $params = @{
                     Method  = 'GET'
@@ -136,8 +127,8 @@ Begin {
 
             #region Test import definition
             try {
-                $M = "Test import type '$Type' with definition ID '$definitionID'"
-                Write-Verbose $M
+                $M = "Test import definition ID '$definitionID' for type '$Type'"
+                Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
 
                 $params = @{
                     Method  = 'GET'
@@ -151,7 +142,7 @@ Begin {
                     throw 'No import definitions found'
                 }
                 if ($importDefinitions.data.id -notContains $definitionID) {
-                    throw "Definition number '$definitionID' not found in the list of known import definitions '$($importDefinitions.data.id)' by CreditDevice"
+                    throw "Import definition number '$definitionID' not found in the list of known import definitions '$($importDefinitions.data.id)' by CreditDevice"
                 }
             }
             catch {
@@ -159,145 +150,104 @@ Begin {
             }
             #endregion
 
-            $scriptBlock = {
-                Param (
-                    [Parameter(Mandatory)]
-                    [String]$Token,
-                    [Parameter(Mandatory)]
-                    [TimeSpan]$Timeout,
-                    [Parameter(Mandatory)]
-                    [String]$Type,
-                    [Parameter(Mandatory)]
-                    [Int]$DefinitionID,
-                    [Parameter(Mandatory)]
-                    [PSCustomObject[]]$DataChunk
-                )
-
-                $importTransaction = @{
-                    id     = 0
-                    result = $null
-                }
-
-                # $VerbosePreference = 'Continue'
-
-                #region Get import transaction id
-                try {
-                    $M = "Get import transaction id for definition '$DefinitionID'"
-                    Write-Verbose $M
-
-                    $params = @{
-                        Method      = 'POST'
-                        Uri         = 'https://api.directdevice.info/imm/imports'
-                        ContentType = 'application/json'
-                        Headers     = @{
-                            Authorization = "Bearer $Token" 
-                            Accept        = 'application/json'
-                        }
-                        # UseBasicParsing = $true
-                        Body        = (
-                            @{
-                                id = $DefinitionID
-                            } | ConvertTo-Json
-                        )
-                        Verbose     = $false
-                    }
-                    $importTransaction.id = (Invoke-RestMethod @params).id
-    
-                    if (-not $importTransaction.id) {
-                        throw 'No transaction id received'
-                    }
-                }
-                catch {
-                    throw "Failed to create an import transaction for type '$Type' with definition number '$definitionID': $_"
-                }
-                #endregion
-        
-                #region Start import
-                try {
-                    $M = "Transaction ID '$($importTransaction.id)' : Start import"
-                    Write-Verbose $M
-
-                    $params = @{
-                        Method      = 'PUT'
-                        Uri         = 'https://api.directdevice.info/imm/imports/{0}/contents' -f $importTransaction.id
-                        ContentType = 'application/json'
-                        Headers     = @{
-                            Authorization = "Bearer $Token" 
-                            Accept        = 'application/json'
-                        }
-                        Body        = $DataChunk | ConvertTo-Json
-                        Verbose     = $false
-                    }
-                    $importTransaction.result = Invoke-RestMethod @params
-                }
-                catch {
-                    throw "Failed to start the import for type '$Type' with  definition number '$definitionID' and transaction id '$($importTransaction.id)': $_"
-                }
-                #endregion
-
-                #region Check import status
-                try {
-                    $params = @{
-                        Method  = 'GET'
-                        Uri     = 'https://api.directdevice.info/imm/imports/{0}' -f $importTransaction.id
-                        Headers = @{
-                            Authorization = "Bearer $Token" 
-                            Accept        = 'application/json'
-                        }
-                        Verbose = $false
-                    }
-                
-                    $timer = [Diagnostics.Stopwatch]::StartNew()
-
-                    while (
-                    ($importTransaction.result.status -notMatch '^finished$|^failed$') -and 
-                    ($timer.elapsed -lt $Timeout)
-                    ) {
-                        $importTransaction.result = Invoke-RestMethod @params
-
-                        Write-Verbose "Transaction ID '$($importTransaction.id)' : Import status '$($importTransaction.result.status)' progress '$($importTransaction.result.progress)'"
-                        Start-Sleep -Seconds 8
-                    }
-
-                    if ($importTransaction.result.status -notMatch '^finished$|^failed$') {
-                        throw "We stopped waiting for the API to return the result 'Finished' or 'Failed' after '$([Math]::Round($Timeout.TotalMinutes,2))' minutes. Current status is '$($importTransaction.result.status)'"
-                    }
-                }
-                catch {
-                    throw "Failed to check for the import status of type '$Type' with transaction id '$($importTransaction.id)' and import definition '$definitionID': $_"
-                }
-                #endregion
+            $importTransaction = @{
+                id     = 0
+                result = $null
             }
 
-            #region Upload data in batches
-            $jobs = @()
+            #region Get import transaction id
+            try {
+                $M = "Get import transaction id for definition '$DefinitionID'"
+                Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
 
-            for ($i = 0; $i -lt $Data.Count; $i = $i + $MaxUploadsAtOnce ) {
-                $end = if ($MaxUploadsAtOnce -eq 1) {
-                    $i
+                $params = @{
+                    Method      = 'POST'
+                    Uri         = 'https://api.directdevice.info/imm/imports'
+                    ContentType = 'application/json'
+                    Headers     = @{
+                        Authorization = "Bearer $Token" 
+                        Accept        = 'application/json'
+                    }
+                    # UseBasicParsing = $true
+                    Body        = (
+                        @{
+                            id = $DefinitionID
+                        } | ConvertTo-Json
+                    )
+                    Verbose     = $false
                 }
-                else {
-                ($i + $MaxUploadsAtOnce) - 1
+                $importTransaction.id = (Invoke-RestMethod @params).id
+    
+                if (-not $importTransaction.id) {
+                    throw 'No transaction id received'
                 }
-            
-                $M = "Batch upload $($Data.Count) records: $i > $end"
-                Write-Verbose $M
+            }
+            catch {
+                throw "Failed to create an import transaction for type '$Type' with definition number '$definitionID': $_"
+            }
+            #endregion
+        
+            #region Start import
+            try {
+                $M = "Start upload of '$Type' data with transaction ID '$($importTransaction.id)'"
+                Write-Verbose $M; Write-EventLog @EventOutParams -Message $M
 
-                $jobParams = @{
-                    ScriptBlock  = $scriptBlock 
-                    ArgumentList = $Token, $Timeout, $Type, $definitionID, $Data[$i..$end]
+                $params = @{
+                    Method      = 'PUT'
+                    Uri         = 'https://api.directdevice.info/imm/imports/{0}/contents' -f $importTransaction.id
+                    ContentType = 'application/json'
+                    Headers     = @{
+                        Authorization = "Bearer $Token" 
+                        Accept        = 'application/json'
+                    }
+                    Body        = $Data | ConvertTo-Json
+                    Verbose     = $false
                 }
-                $jobs += Start-Job @jobParams
-                Wait-MaxRunningJobsHC -Name $jobs -MaxThreads $ThrottleLimit
-            } 
+                $importTransaction.result = Invoke-RestMethod @params
+            }
+            catch {
+                throw "Failed to start the import for type '$Type' with  definition number '$definitionID' and transaction id '$($importTransaction.id)': $_"
+            }
             #endregion
 
-            $jobs | Receive-Job -Wait -AutoRemoveJob
+            #region Check import status
+            try {
+                $M = 'Wait for CreditDevice to confirm upload is complete'
+                Write-Verbose $M; Write-EventLog @EventVerboseParams -Message $M
 
-            Write-Verbose 'Import done'
+                $params = @{
+                    Method  = 'GET'
+                    Uri     = 'https://api.directdevice.info/imm/imports/{0}' -f $importTransaction.id
+                    Headers = @{
+                        Authorization = "Bearer $Token" 
+                        Accept        = 'application/json'
+                    }
+                    Verbose = $false
+                }
+                
+                $timer = [Diagnostics.Stopwatch]::StartNew()
+
+                while (
+                    ($importTransaction.result.status -notMatch '^finished$|^failed$') -and 
+                    ($timer.elapsed -lt $Timeout)
+                ) {
+                    $importTransaction.result = Invoke-RestMethod @params
+
+                    Write-Verbose "Transaction ID '$($importTransaction.id)' : Import status '$($importTransaction.result.status)' progress '$($importTransaction.result.progress)'"
+                    Start-Sleep -Seconds 8
+                }
+
+                if ($importTransaction.result.status -notMatch '^finished$|^failed$') {
+                    throw "We stopped waiting for the API to return the result 'Finished' or 'Failed' after '$([Math]::Round($Timeout.TotalMinutes,2))' minutes. Current status is '$($importTransaction.result.status)'"
+                }
+            }
+            catch {
+                throw "Failed to check for the import status of type '$Type' with transaction id '$($importTransaction.id)' and import definition '$definitionID': $_"
+            }
+            #endregion
         }
         catch {
-            throw "Failed sending data to CreditDevice: $_"
+            throw "Failed sending '$Type' data to CreditDevice: $_"
         }
     }
 
@@ -522,7 +472,7 @@ Process {
             Type  = 'Debtor'
             Data  = $fileContent.debtor.converted
         }
-        # Send-DataToCreditDeviceHC @sendParams
+        Send-DataToCreditDeviceHC @sendParams
         #endregion
 
         #region Convert invoice strings to objects
@@ -536,7 +486,6 @@ Process {
             try {
                 $documentType = $line.SubString(144, 2).Trim()
                 $sapDocumentNumber = $line.SubString(14, 10).Trim()
-                # $sapDocumentNumber = $line.SubString(174, 12).Trim()
                 $reference = if ($line.length -gt 189) { 
                     $line.SubString(189, $line.length - 189).Trim()
                 }
