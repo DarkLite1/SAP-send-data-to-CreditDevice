@@ -238,7 +238,7 @@ Begin {
                 }
 
                 if ($importTransaction.result.status -notMatch '^finished$|^failed$') {
-                    throw "We stopped waiting for the API to return the result 'Finished' or 'Failed' after '$([Math]::Round($Timeout.TotalMinutes,2))' minutes. Current status is '$($importTransaction.result.status)'"
+                    throw "Stopped waiting for the API to return the result 'Finished' or 'Failed' after '$([Math]::Round($Timeout.TotalMinutes,2))' minutes. Current status is '$($importTransaction.result.status)'"
                 }
             }
             catch {
@@ -562,22 +562,21 @@ End {
             Priority    = 'Normal'
         }
 
-        #region Set mail subject and priority
+        #region Add errors to the mail
         $systemErrors = $Error.Exception.Message | 
         Where-Object { $_ } | Get-Unique
     
+        $htmlSystemErrorsList = $null
+
+        $mailIntro = 'Uploaded data from SAP export files to CreditDevice:'
+
         if ($systemErrors) {
+            $mailIntro = 'Possibly not all data is correctly uploaded from the SAP export files to CreditDevice. Please check the errors.'
             $mailParams.Subject = "{0} error{1}, {2}" -f 
             $systemErrors.Count, $(if ($systemErrors.Count -ge 2) { 's' }), 
             $mailParams.Subject 
             $mailParams.Priority = 'High'
-        }
-        #endregion
-    
-        #region Create system errors HTML list
-        $htmlSystemErrorsList = $null
-    
-        if ($systemErrors) {
+
             $systemErrors | ForEach-Object {
                 Write-EventLog @EventErrorParams -Message $_
             }
@@ -586,12 +585,22 @@ End {
             ConvertTo-HtmlListHC -Spacing Wide -Header 'System errors:'
         }
         #endregion
-    
+        
         #region Send mail to end user
         $mailParams.Message = "
         $htmlSystemErrorsList
-        <p>First test on converting data</p>
-            <p><i>* Check the attachment for details</i></p>
+        <p>$mailIntro</p>
+        <table>
+            <tr>
+                <th>Debtor</th>
+                <td>$($fileContent.debtor.converted.Count)</td>
+            </tr>
+            <tr>
+                <th>Invoice</th>
+                <td>$($fileContent.invoice.converted.Count)</td>
+            </tr>
+        </table>
+        <p><i>* Check the attachment for details</i></p>
         "
 
         Get-ScriptRuntimeHC -Stop
