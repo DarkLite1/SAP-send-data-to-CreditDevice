@@ -16,11 +16,11 @@
     In case there is no .ASC file created on the day that the script runs, 
     nothing is done and no mail is sent out.
 
-.PARAMETER DebtorFile
-    File path containing the debtors
+.PARAMETER DebtorFiles
+    List of file paths containing the debtors.
 
-.PARAMETER InvoiceFile
-    File path containing the invoices
+.PARAMETER InvoiceFiles
+    List of file path containing the invoices.
 #>
 
 [CmdLetBinding()]
